@@ -1,0 +1,165 @@
+[
+  {
+    "id": "table.posts",
+    "label": "Create table \"posts\"",
+    "summary": "Creates table \"posts\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "posts"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"posts\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"posts\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"posts\"",
+        "sql": "CREATE TABLE \"public\".\"posts\" (\n  \"authorId\" text NOT NULL,\n  \"content\" text,\n  \"id\" text NOT NULL,\n  \"title\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"posts\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"posts\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "alterNullability.dropNotNull.users.profile_image",
+    "label": "Drop NOT NULL on \"users\".\"profile_image\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "profile_image",
+        "table": "users"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"profile_image\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "users",
+          "profile_image"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop NOT NULL on \"profile_image\"",
+        "sql": "ALTER TABLE \"public\".\"users\" ALTER COLUMN \"profile_image\" DROP NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"profile_image\" is nullable",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "users",
+          "profile_image",
+          "YES"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.posts.posts_authorId_idx_e47547ed",
+    "label": "Create index \"posts_authorId_idx_e47547ed\" on \"posts\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "posts_authorId_idx_e47547ed",
+        "table": "posts"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"posts_authorId_idx_e47547ed\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"posts_authorId_idx_e47547ed\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"posts_authorId_idx_e47547ed\"",
+        "sql": "CREATE INDEX \"posts_authorId_idx_e47547ed\" ON \"public\".\"posts\" (\"authorId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"posts_authorId_idx_e47547ed\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"posts_authorId_idx_e47547ed\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.posts.posts_authorId_fkey",
+    "label": "Add foreign key \"posts_authorId_fkey\" on \"posts\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "posts_authorId_fkey",
+        "table": "posts"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"posts_authorId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "posts_authorId_fkey",
+          "public",
+          "\"public\".\"posts\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"posts_authorId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"posts\"\nADD CONSTRAINT \"posts_authorId_fkey\"\nFOREIGN KEY (\"authorId\")\nREFERENCES \"public\".\"users\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"posts_authorId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "posts_authorId_fkey",
+          "public",
+          "\"public\".\"posts\""
+        ]
+      }
+    ]
+  }
+]

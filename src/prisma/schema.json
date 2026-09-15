@@ -109,7 +109,7 @@
                 }
               },
               "last_name": {
-                "nullable": false,
+                "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
@@ -269,7 +269,7 @@
                 "last_name": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
-                  "nullable": false
+                  "nullable": true
                 },
                 "password": {
                   "codecId": "pg/text@1",
@@ -308,7 +308,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "92c5c9a021cb02ec8f129c533d97e093a9a6efd465fe23af64a685df4e28c4d3"
+    "storageHash": "3b204c5af48d4e08ac8985d12bca8888dc28f89d2b5304557f5fd33255ad1304"
   },
   "execution": {
     "executionHash": "9ab64c5ca48ce72df699aa2ad3789cc91ae1921873995222a7dd65036ec4fb5b",

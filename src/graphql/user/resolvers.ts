@@ -1,36 +1,34 @@
 
 import { db } from "./../../prisma/db.js";
+import userService from "../../services/user/userService.js";
+import type { createUserPayload, loginUserPayload } from "../../services/user/userService.js";
+import { error } from "node:console";
 const query = {
     hello: () => "Hello from GraphQL!",
     yourname: (parent: any, { age }: { age: number }) =>
           `Hello! You are ${age} years old.`,
+    loginUser: async (_parent: any, payload : loginUserPayload) => {
+      const res = await userService.loginUser(payload);
+      return res;
+    },
+    getLoggedInUser : async (_parent: any, param: any, context: any) => {
+        if (context?.user) {
+            const userDetails = await userService.getUserById(context.id);
+            return userDetails;              
+        }
+        else {
+            throw new Error("unknown error")
+        }
+
+    }
 };
 const mutation = {
     createUser: async (
-          _parent: any,
-          {
-            first_name,
-            last_name,
-            email,
-            password,
-            salt,
-          }: {
-            first_name: string;
-            last_name: string;
-            email: string;
-            password: string;
-            salt: string;
-          }
+          _parent:any,
+          payload:createUserPayload
         ) => {
-          await db.orm.public!.User!.create({
-            first_name,
-            last_name,
-            email,
-            password,
-            salt,
-          });
-
-          return true;
+          const res = await userService.createUser(payload);
+          return res?.id;
         }
 };
 
